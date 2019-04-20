@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Workspaces</title>
+        <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+<nav class="teal lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Logo</a>
+    </div>
+  </nav>
+
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h2 class="header center teal-text">What workspace would you like to enter?</h2>
+      <div class="input-field col s6 center">
+          <input id="workspace-name-input" type="text">
+          <label for="last_name">Workspace</label>
+      </div>
+      <div class="row center">
+          <input id="workspace-name-submit" class="btn-large waves-effect waves-light teal white-text" type="button" value="Enter"/>
+      </div>
+      <br><br>
+
+    </div>
+  </div>
+
+    <script>
+        document.querySelector('#workspace-name-input').focus();
+        document.querySelector('#workspace-name-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#workspace-name-submit').click();
+            }
+        };
+
+        document.querySelector('#workspace-name-submit').onclick = function(e) {
+            var workspaceName = document.querySelector('#workspace-name-input').value;
+            if (workspaceName !== "") {
+                window.location.pathname = '/workspace/' + workspaceName + '/';
+            }
+        };
+    </script>
+</body>
+</html>

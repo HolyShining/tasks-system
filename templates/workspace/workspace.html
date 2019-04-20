@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h4 class="center-align">Tasks in {{ workspace_name_json|title}} workspace:</h4>
+    </div>
+
+    <div class="row" id="task-history"></div>
+
+    <!-- Modal Structure -->
+<div id="modal1" class="modal bottom-sheet">
+    <div class="modal-content">
+      <h4>Add New Task:</h4>
+        <div class="input-field col s6 inline">
+    <input id="modal-task-input" type="text" data-length="100"/>
+        </div>
+        <a class="btn-floating" id="modal-task-submit"><i class="small material-icons">send</i></a>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+    </div>
+  </div>
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large waves-effect waves-light teal modal-trigger" href="#modal1"><i class="small material-icons">add</i></a>
+    </div>
+</body>
+<script>
+    M.AutoInit();
+
+    const colors = ['teal','pink','indigo','blue', 'cyan', 'lime', 'grey'];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const elems = document.querySelectorAll('.modal');
+        const instances = M.Modal.init(elems);
+    });
+
+    Array.prototype.randomElement = function () {
+    return this[Math.floor(Math.random() * this.length)]
+    };
+
+    let workspaceName = {{ workspace_name_json }};
+
+    const Socket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/workspace/' + workspaceName + '/');
+
+    Socket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var message = data['message'];
+        let component = "    <div class=\"col s3\">\n" +
+            "      <div class=\"card-panel " + colors.randomElement() +"\">\n" +
+            "        <span class=\"white-text\">\n" +
+                        message +
+            "        </span>\n" +
+            "      </div>\n" +
+            "    </div>\n";
+        document.querySelector('#task-history').innerHTML += (component);
+
+    };
+
+    Socket.onclose = function(e) {
+        console.error('Web Socket closed unexpectedly');
+    };
+
+    document.querySelector('#modal-task-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#modal-task-submit').click();
+        }
+    };
+
+    document.querySelector('#modal-task-submit').onclick = function(e) {
+        const messageInputDom = document.querySelector('#modal-task-input');
+        const message = messageInputDom.value;
+        const elem = document.querySelector('#modal1');
+        const instance = M.Modal.getInstance(elem);
+        console.log("get modal event");
+        instance.close();
+        Socket.send(JSON.stringify({
+            'message': message
+        }));
+
+        messageInputDom.value = '';
+    };
+</script>
+</html>
